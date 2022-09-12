@@ -1,4 +1,8 @@
-// CLASE PRODUCTO
+/* ================  ================ */
+// ARRAY DE PRODUCTOS (Global)
+let productos = []
+
+/* ================ CLASE PRODUCTO ================ */
 class Producto {
     constructor(tipoProd, marca, precio, stock) {
 
@@ -10,18 +14,14 @@ class Producto {
     }
 
     // MÉTODOS
-    vender = (tipoProd, marca, cant) => {
-        if (tipoProd == this.tipoProd && marca == this.marca) {
-            if (this.validarStock(cant)) {
-                this.disminuirStock(cant)
-                console.log(`Venta exitosa - Quedan ${cant} unidades del producto ${tipoProd} ${marca} (stock actualizado OK)`)
-            }
-            else {
-                console.log(`Venta fallida - Stock insuficiente, hay sólo ${this.stock} unidades del producto ${tipoProd} ${marca}`)
-            }
+    comprar = (cant) => {
+        if (this.validarStock(cant)) {
+            this.disminuirStock(cant)
+            alert("Compra efectuada con éxito\nMuchas gracias!")
+            console.log(`Stock actualizado - Quedan ${this.stock} unidades del producto ${this.tipoProd} ${this.marca}`)
         }
         else {
-            console.log("El producto que desea vender no forma parte de su inventario")
+            alert(`Stock insuficiente - Hay ${this.stock} unidades de ${this.tipoProd} ${this.marca}`)
         }
     }
 
@@ -32,85 +32,77 @@ class Producto {
     }
 }
 
-// ARRAY DE PRODUCTOS
-let productos = []
+/* ================ MENÚ DE COMPRA ================ */
+menuCompra = () => parseInt(prompt("Bienvenido, escoja el producto que desea comprar: \n\n" + mostrarCatalogoProductos()))
 
-// TRANSFORMA OBJETO A TEXTO PARA VER LOS DISTINTOS ESTADÍOS DEL OBJETO
-function mostrarObjetoEnTexto(objeto) {
-    console.log("Producto\n---------")
-    for (clave in objeto) {
-        if (typeof objeto[clave] != "function") {
-            console.log(`${clave}:${objeto[clave]}`)
-        }
-    }
+function mostrarCatalogoProductos() {
+    let option = 1
+    let textoCatalogo = ""
+    productos.forEach((prod) => {textoCatalogo += `${option}.  ${prod.tipoProd}, ${prod.marca}, $${prod.precio}, ${prod.stock} unidades\n`; option++})
+    textoCatalogo += `${option}.  salir`
+    return textoCatalogo
 }
 
-// SOLICITAR PRODUCTO POR TECLADO
-function obtenerProductoPorTeclado() {
-    let tipoProd = prompt("Ingrese tipo de producto: ")
-    let marca = prompt("Ingrese marca del producto: ")
-    let precio = parseFloat(prompt("Ingrese precio del producto: "))
-    let cant = parseInt(prompt("Ingrese cantidad de unidades del producto: "))
-    return new Producto(tipoProd, marca, precio, cant)
-}
-
-
-agregarProducto = (producto) => {
-
-	if (validarAlta(producto.tipoProd, producto.marca)) {
-		productos.push(producto)
-	}
-    else {
-        console.log("El producto ingresado ya existe")
-    }
-}
-
-validarAlta = (tipoProd, marca) => {
-    for (let producto of productos) {
-        if (tipoProd == producto.tipoProd && marca == producto.marca) {
-            return false // El producto ya existe, rechazar alta
-            break
-        }
-    }
-    return true
-}
-
+/* ================ DECLARACIÓN FUNCIÓN PRINCIPAL ================ */
 function main() {
 
-    // CARGA DE EXISTENCIAS DE PRODUCTOS
-    const lapiceraBic = new Producto("lapicera", "bic", 50, 10)
-    const lapiceraPelikan = new Producto("lapicera", "pelikan", 70, 5)
-    const borradorPelikan = new Producto("goma de borrar", "pelikan", 15, 15)
-    const sacapuntasMaped = new Producto("sacapuntas", "maped", 25, 4)
-    productos.push(lapiceraBic)
-    productos.push(lapiceraPelikan)
-    productos.push(borradorPelikan)
-    productos.push(sacapuntasMaped)
+    let eleccionMenuCompra = 0
+    let eleccionMenuRepeat = 0
+    let salirMenuCompra = 0
+    let cantDeseadaProd = 0
 
-    const producto = obtenerProductoPorTeclado()
-    console.log(producto)
-    agregarProducto(producto)
-    console.log(productos)
+    // CARGA DE PRODUCTOS
+    productos.push(new Producto("lapicera", "bic", 50, 10))
+    productos.push(new Producto("lapicera", "pelikan", 70, 5))
+    productos.push(new Producto("goma de borrar", "pelikan", 15, 15))
+    productos.push(new Producto("sacapuntas", "maped", 25, 4))
+
+    // MUESTRA DE MENÚ, SELECCIÓN Y EJECUCIÓN DE COMPRA
+    while (true) { // itera hasta que el usuario salga o deje de comprar productos
+
+        salirMenuCompra = productos.length + 1
+
+        while (true) { // itera hasta que la opción ingresada sea válida
+            eleccionMenuCompra = menuCompra()
+            if (eleccionMenuCompra > 0 && eleccionMenuCompra <= salirMenuCompra) {
+                break
+            }
+            alert("Opción incorrecta")
+        }
+
+        if (eleccionMenuCompra === salirMenuCompra) {
+            break
+        }
+        else
+        {
+            prodElegido = productos[eleccionMenuCompra - 1]
+
+            while (true) { // itera hasta que la opción ingresada sea válida
+                cantDeseadaProd = parseInt(prompt(`Especifique la cantidad de unidades de ${prodElegido.tipoProd} ${prodElegido.marca} que desea comprar`))
+                if (cantDeseadaProd > 0) {
+                    break
+                }
+                alert("Opción incorrecta")
+            }
+
+            prodElegido.comprar(cantDeseadaProd)
+
+            while (true) { // itera hasta que la opción ingresada sea válida
+                eleccionMenuRepeat = parseInt(prompt("Desea realizar otra compra?\n1.  SI\n2.  NO"))
+                if ((eleccionMenuRepeat === 1 || eleccionMenuRepeat === 2)) {
+                    break
+                }
+                alert("Opción incorrecta")
+            }
+
+            if (eleccionMenuRepeat === 2) {
+                break
+            }
+        }
+    }
+
+    alert("Muchas gracias por visitarnos, hasta luego!")
 }
 
+/* ================ LLAMADO FUNCIÓN PRINCIPAL ================ */
 main()
-
-
-// SIMULACIÓN DE VENTA
-
-// mostrarObjetoEnTexto(producto)
-
-// Test de Producto inexistente
-// console.log("\nSimulación de venta de producto inexistente (Venta de 2 lapiceras pelikan)\n--------------------------------------------")
-// console.log(lapicera.vender("lapicera", "pelikan", 2))
-
-
-// Test de faltantes
-// console.log("\nSimulación de venta con stock insuficiente (Venta de 20 lapiceras bic)\n-------------------------------------------")
-// console.log(producto.vender("lapicera", "bic", 20))
-// mostrarObjetoEnTexto(producto)
-
-// Test de stock suficiente
-// console.log("\nSimulación de venta con stock suficiente (Venta de 5 lapiceras bic)\n-----------------------------------------")
-// console.log(producto.vender("lapicera", "bic", 5))
-// mostrarObjetoEnTexto(producto)

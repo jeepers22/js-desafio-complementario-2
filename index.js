@@ -1,4 +1,3 @@
-/* ================  ================ */
 // ARRAY DE PRODUCTOS (Global)
 let productos = []
 
